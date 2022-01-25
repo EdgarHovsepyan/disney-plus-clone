@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+
 import {
   selectUserName,
   selectUserPhoto,
@@ -20,15 +22,14 @@ const Header = () => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUser(user);
-        history("/");
+        history("/home");
       }
     });
   }, [userName]);
 
   const handleAuth = () => {
     if (!userName) {
-      auth
-        .signInWithPopup(provider)
+      signInWithPopup(auth, provider)
         .then((result) => {
           setUser(result.user);
         })
@@ -36,11 +37,12 @@ const Header = () => {
           alert(error.message);
         });
     } else if (userName) {
+      console.log( "dskfsndfkn");
       auth
         .signOut()
         .then(() => {
           dispatch(setSignOutState());
-          history.push("/");
+          history("/");
         })
         .catch((err) => alert(err.message));
     }
@@ -94,8 +96,8 @@ const Header = () => {
           </NavMenu>
           <SignOut>
             <UserImg src={userPhoto} alt={userName} />
-            <DropDown>
-              <span onClick={handleAuth}>Sign out</span>
+            <DropDown onClick={handleAuth}>
+              <span>Sign out</span>
             </DropDown>
           </SignOut>
         </>
@@ -126,6 +128,7 @@ const Logo = styled.a`
   max-height: 70px;
   font-size: 0;
   display: inline-block;
+  cursor: pointer;
 
   img {
     display: block;
@@ -149,6 +152,7 @@ const NavMenu = styled.div`
     display: flex;
     align-items: center;
     padding: 0 12px;
+    cursor: pointer;
 
     img {
       height: 20px;
@@ -206,6 +210,7 @@ const Login = styled.a`
   border: 1px solid #f9f9f9;
   border-radius: 4px;
   transition: all 0.2s ease 0s;
+  cursor: pointer;
 
   &:hover {
     background-color: #f9f9f9;
